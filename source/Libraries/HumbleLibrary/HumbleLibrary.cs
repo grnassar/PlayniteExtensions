@@ -70,7 +70,10 @@ namespace HumbleLibrary
                                 Source = new MetadataNameProperty("Humble"),
                                 Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
                             };
-
+                            if (true)
+                            {
+                                game.Tags = new List<MetadataProperty> { new MetadataNameProperty("Trove") };
+                            }
                             games.Add(game);
                         }
                     }
