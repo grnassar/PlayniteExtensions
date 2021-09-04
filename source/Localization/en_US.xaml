@@ -62,6 +62,8 @@ Note that the Account Name option only works for accounts whose game libraries h
     <!--Humble-->
     <sys:String x:Key="LOCHumbleIgnoreThirdPartyStoreGames">Ignore third party store games</sys:String>
     <sys:String x:Key="LOCHumbleImportTroveGames">Import Trove games</sys:String>
+    <sys:String x:Key="LOCHumbleImportAllTrove">Even if they already exist elsewhere</sys:String>
+    <sys:String x:Key="LOCHumbleTagTroveGames">Add "Trove" tag to games added from Trove</sys:String>
     <sys:String x:Key="LOCHumbleIgnoreThirdPartyStoreGamesTooltip" xml:space="preserve">Enable to skip importing games that require third-party clients,
 including stores already managed in Playnite, to prevent duplicates.</sys:String>
     <sys:String x:Key="LOCHumbleImportThirdPartyDrmFree">Import if DRM free version is available</sys:String>

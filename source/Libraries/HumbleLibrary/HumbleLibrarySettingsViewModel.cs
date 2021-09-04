@@ -16,6 +16,8 @@ namespace HumbleLibrary
         public bool IgnoreThirdPartyStoreGames { get; set; } = true;
         public bool ImportThirdPartyDrmFree { get; set; } = false;
         public bool ImportTroveGames { get; set; } = false;
+        public bool ImportAllTrove { get; set; } = false;
+        public bool TagTroveGames { get; set; } = false;
     }
 
     public class HumbleLibrarySettingsViewModel : PluginSettingsViewModel<HumbleLibrarySettings, HumbleLibrary>

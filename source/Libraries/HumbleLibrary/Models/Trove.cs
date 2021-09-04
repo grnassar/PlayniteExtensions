@@ -26,6 +26,12 @@ namespace HumbleLibrary.Models
             public string developer_name;
         }
 
+        public class Download
+        {
+            [SerializationPropertyName("machine_name")]
+            public string machine_name;
+        }
+
         public string machine_name;
         public string image;
 
@@ -41,5 +47,7 @@ namespace HumbleLibrary.Models
         public List<Developer> developers;
 
         public List<Publisher> publishers;
+
+        public Dictionary<string, Download> downloads;
     }
 }

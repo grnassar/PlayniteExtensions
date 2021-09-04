@@ -33,17 +33,17 @@ namespace HumbleLibrary
             SettingsViewModel = new HumbleLibrarySettingsViewModel(this, PlayniteApi);
         }
 
-        private static string GetGameId(Order.SubProduct product)
+        internal string GetGameId(Order.SubProduct product)
         {
             return $"{product.machine_name}_{product.human_name}";
         }
 
-        private static string GetGameId(TroveGame troveGame)
+        internal string GetGameId(TroveGame troveGame)
         {
             return $"{troveGame.machine_name}_{troveGame.human_name}_TROVE";
         }
 
-        public List<GameMetadata> GetTroveGames()
+        internal List<GameMetadata> GetTroveGames()
         {
             var chunkDataUrlBase = @"https://www.humblebundle.com/api/v1/trove/chunk?property=popularity&direction=desc&index=";
             var games = new List<GameMetadata>();
@@ -68,9 +68,20 @@ namespace HumbleLibrary
                                 Publishers = troveGame.publishers?.Select(a => new MetadataNameProperty(a.publisher_name)).ToList(),
                                 Developers = troveGame.developers?.Select(a => new MetadataNameProperty(a.developer_name)).ToList(),
                                 Source = new MetadataNameProperty("Humble"),
-                                Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                                //Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                                //Platforms = new List<MetadataProperty> { }
                             };
-                            if (true)
+                            // does not work, because Platforms is IEnumerable - that's for views and shouldn't be used for internal members; should be ICollection - TODO
+                            //if (troveGame.downloads.ContainsKey("windows")) { game.Platforms.Add(new MetadataSpecProperty("pc_windows")); }
+                            //if (troveGame.downloads.ContainsKey("mac")) { game.Platforms.Add(new MetadataSpecProperty("mac")); }
+                            //if (troveGame.downloads.ContainsKey("linux")) { game.Platforms.Add(new MetadataSpecProperty("linux")); }
+                            var platforms = new List<MetadataProperty> { };
+                            if (troveGame.downloads.ContainsKey("windows")) { platforms.Add(new MetadataSpecProperty("pc_windows")); }
+                            if (troveGame.downloads.ContainsKey("mac")) { platforms.Add(new MetadataSpecProperty("mac")); }
+                            if (troveGame.downloads.ContainsKey("linux")) { platforms.Add(new MetadataSpecProperty("linux")); }
+                            game.Platforms = platforms;
+
+                            if (SettingsViewModel.Settings.TagTroveGames)
                             {
                                 game.Tags = new List<MetadataProperty> { new MetadataNameProperty("Trove") };
                             }
@@ -174,7 +185,7 @@ namespace HumbleLibrary
                     foreach (var troveGame in GetTroveGames())
                     {
                         // Don't import Trove game if it's part of main library
-                        if (selectedProducts.Any(a => a.human_name.RemoveTrademarks().Equals(troveGame.Name, StringComparison.OrdinalIgnoreCase)))
+                        if (!SettingsViewModel.Settings.ImportAllTrove && selectedProducts.Any(a => a.human_name.RemoveTrademarks().Equals(troveGame.Name, StringComparison.OrdinalIgnoreCase)))
                         {
                             continue;
                         }
