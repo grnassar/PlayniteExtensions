@@ -77,8 +77,9 @@ namespace HumbleLibrary
                             //if (troveGame.downloads.ContainsKey("linux")) { game.Platforms.Add(new MetadataSpecProperty("linux")); }
                             var platforms = new List<MetadataProperty> { };
                             if (troveGame.downloads.ContainsKey("windows")) { platforms.Add(new MetadataSpecProperty("pc_windows")); }
-                            if (troveGame.downloads.ContainsKey("mac")) { platforms.Add(new MetadataSpecProperty("mac")); }
-                            if (troveGame.downloads.ContainsKey("linux")) { platforms.Add(new MetadataSpecProperty("linux")); }
+                            // Commenting out below until upstream accepts pull request to update platforms list
+                            //if (troveGame.downloads.ContainsKey("mac")) { platforms.Add(new MetadataSpecProperty("mac")); }
+                            //if (troveGame.downloads.ContainsKey("linux")) { platforms.Add(new MetadataSpecProperty("linux")); }
                             game.Platforms = platforms;
 
                             if (SettingsViewModel.Settings.TagTroveGames)
@@ -94,7 +95,7 @@ namespace HumbleLibrary
                     Logger.Warn("Failed to get number of trove chunks.");
                 }
             }
-
+            Logger.Info("Retrieved " + games.Count() + " Humble Trove games");
             return games.OrderBy(a => a.Name).ToList();
         }
 

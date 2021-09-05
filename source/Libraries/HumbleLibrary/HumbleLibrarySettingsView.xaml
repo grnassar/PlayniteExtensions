@@ -38,6 +38,7 @@
                       Content="{DynamicResource LOCHumbleImportAllTrove}"/>
             <CheckBox Margin="25,13,0,0"
                       IsChecked="{Binding Settings.TagTroveGames}"
+                      IsEnabled="{Binding IsChecked, ElementName=HumbleImportTroveGames}"
                       Content="{DynamicResource LOCHumbleTagTroveGames}"/>
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                 <Button Content="{DynamicResource LOCAuthenticateLabel}" HorizontalAlignment="Left"                         
