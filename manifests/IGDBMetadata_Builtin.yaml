@@ -1,8 +1,34 @@
 AddonId: IGDBMetadata_Builtin
 Packages:
+  - Version: 2.2
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-09-24
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/IGDBMetadata_Builtin_2_2.pext
+    Changelog:
+      - Manual metadata search doesn't work in some cases
+      - Updated dependencies for Playnite 9
+  - Version: 2.1
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-09-08
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/1.0/IGDBMetadata_Builtin_2_1.pext
+    Changelog:
+      - Metadata download doesn't work properly in some cases
+      - Updated to support Playnite 9 beta 2
   - Version: 2.0
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-09-03
     PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/1.0/IGDBMetadata_Builtin_2_0.pext
     Changelog:
       - Playnite 9 support
+  - Version: 2.3
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-10-22
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/IGDBMetadata_Builtin_2_3.pext
+    Changelog:
+      - Fixed metadata download failing for some games
+  - Version: 2.4
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-12-17
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/IGDBMetadata_Builtin_2_4.pext
+    Changelog:
+      - Name field support for bulk downloads

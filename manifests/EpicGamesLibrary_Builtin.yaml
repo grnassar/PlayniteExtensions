@@ -1,8 +1,59 @@
 AddonId: EpicGamesLibrary_Builtin
 Packages:
+  - Version: 2.2
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-09-24
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/EpicGamesLibrary_Builtin_2_2.pext
+    Changelog:
+      - Updated dependencies for Playnite 9
+  - Version: 2.1
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-09-08
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/1.0/EpicGamesLibrary_Builtin_2_1.pext
+    Changelog:
+      - Authentication doesn't work properly
+      - Updated to support Playnite 9 beta 2
   - Version: 2.0
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-09-03
     PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/1.0/EpicGamesLibrary_Builtin_2_0.pext
     Changelog:
       - Playnite 9 support
+  - Version: 2.3
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-10-12
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/EpicGamesLibrary_Builtin_2_3.pext
+    Changelog:
+      - Canceling library sync takes too long
+  - Version: 2.4
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-10-27
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/EpicGamesLibrary_Builtin_2_4.pext
+    Changelog:
+      - Fixed Epic client installation not detected properly
+  - Version: 2.5
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-11-05
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/EpicGamesLibrary_Builtin_2_5.pext
+    Changelog:
+      - Fixed import of uninstalled games not working properly sometimes
+  - Version: 2.6
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-11-23
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/EpicGamesLibrary_Builtin_2_6.pext
+    Changelog:
+      - Temporarily reworked how authentication works
+  - Version: 2.7
+    RequiredApiVersion: 6.2.0
+    ReleaseDate: 2021-12-13
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/EpicGamesLibrary_Builtin_2_7.pext
+    Changelog:
+      - Restored original authentication process
+      - Game installation no longer just opens Epic client, but actually starts installation of specific game (by darklinkpower)
+  - Version: 2.9
+    RequiredApiVersion: 6.2.0
+    ReleaseDate: 2022-02-08
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/EpicGamesLibrary_Builtin_2_9.pext
+    Changelog:
+      - Fixed detection of installed games
+      - Updated localizations

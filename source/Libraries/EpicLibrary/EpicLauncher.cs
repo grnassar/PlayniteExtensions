@@ -14,6 +14,7 @@ namespace EpicLibrary
     public class EpicLauncher
     {
         public const string GameLaunchUrlMask = @"com.epicgames.launcher://apps/{0}?action=launch&silent=true";
+        public const string GameInstallUrlMask = @"com.epicgames.launcher://apps/{0}?action=install";
         public const string LibraryLaunchUrl = @"com.epicgames.launcher://store/library";
 
         public static string AllUsersPath => Path.Combine(Environment.ExpandEnvironmentVariables("%PROGRAMDATA%"), "Epic");
@@ -48,9 +49,9 @@ namespace EpicLibrary
                 if (progs == null)
                 {
                     // Try default location. These registry keys sometimes go missing on people's PCs...
-                    if (File.Exists(GetExecutablePath(@"C:\Program Files(x86)\Epic Games\")))
+                    if (File.Exists(GetExecutablePath(@"C:\Program Files (x86)\Epic Games\")))
                     {
-                        return @"C:\Program Files(x86)\Epic Games\";
+                        return @"C:\Program Files (x86)\Epic Games\";
                     }
                     else if (File.Exists(GetExecutablePath(@"C:\Program Files\Epic Games\")))
                     {

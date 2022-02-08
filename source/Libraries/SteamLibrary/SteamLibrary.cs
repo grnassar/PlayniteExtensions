@@ -59,7 +59,7 @@ namespace SteamLibrary
                     FontSize = 20,
                     FontFamily = ResourceProvider.GetResource("FontIcoFont") as FontFamily
                 },
-                Title = "Steam Friends",
+                Title = ResourceProvider.GetString(LOC.SteamFriendsTooltip),
                 Activated = () => Process.Start(@"steam://open/friends"),
                 Visible = SettingsViewModel.Settings.ShowFriendsButton
             };
@@ -111,7 +111,7 @@ namespace SteamLibrary
                 Name = name.RemoveTrademarks(),
                 InstallDirectory = installDir,
                 IsInstalled = true,
-                Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                Platforms = new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
             };
 
             return game;
@@ -209,10 +209,10 @@ namespace SteamLibrary
                 Name = modInfo.Name.RemoveTrademarks(),
                 InstallDirectory = path,
                 IsInstalled = true,
-                Developers = new List<MetadataProperty>() { new MetadataNameProperty(modInfo.Developer) },
+                Developers = new HashSet<MetadataProperty>() { new MetadataNameProperty(modInfo.Developer) },
                 Links = modInfo.Links,
-                Tags = modInfo.Categories?.Select(a => new MetadataNameProperty(a)).ToList(),
-                Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                Tags = modInfo.Categories?.Select(a => new MetadataNameProperty(a)).Cast<MetadataProperty>().ToHashSet(),
+                Platforms = new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
             };
 
             if (!modInfo.IconPath.IsNullOrEmpty() && File.Exists(modInfo.IconPath))
@@ -390,7 +390,7 @@ namespace SteamLibrary
         {
             if (settings.UserId.IsNullOrEmpty())
             {
-                throw new Exception(PlayniteApi.Resources.GetString("LOCNotLoggedInError"));
+                throw new Exception(PlayniteApi.Resources.GetString(LOC.SteamNotLoggedInError));
             }
 
             var userId = ulong.Parse(settings.UserId);
@@ -412,8 +412,11 @@ namespace SteamLibrary
                 libraryUrl += "&include_free_sub=1";
             }
 
-            var stringLibrary = HttpDownloader.DownloadString(string.Format(libraryUrl, apiKey, userId));
-            return Serialization.FromJson<GetOwnedGamesResult>(stringLibrary);
+            using (var webClient = new WebClient { Encoding = Encoding.UTF8 })
+            {
+                var stringLibrary = webClient.DownloadString(string.Format(libraryUrl, apiKey, userId));
+                return Serialization.FromJson<GetOwnedGamesResult>(stringLibrary);
+            }
         }
 
         internal List<GameMetadata> GetLibraryGames(ulong userId, List<GetOwnedGamesResult.Game> ownedGames)
@@ -448,10 +451,10 @@ namespace SteamLibrary
                     Name = game.name.RemoveTrademarks(),
                     GameId = game.appid.ToString(),
                     Playtime = (ulong)(game.playtime_forever * 60),
-                    Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                    Platforms = new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
                 };
 
-                if (lastActivity != null && lastActivity.TryGetValue(newGame.GameId, out var gameLastActivity))
+                if (lastActivity != null && lastActivity.TryGetValue(newGame.GameId, out var gameLastActivity) && newGame.Playtime > 0)
                 {
                     newGame.LastActivity = gameLastActivity;
                 }
@@ -516,7 +519,7 @@ namespace SteamLibrary
             if (accountId == 0)
             {
                 dialogs.ShowMessage(
-                    resources.GetString("LOCSettingsSteamLastActivityImportErrorAccount"),
+                    resources.GetString(LOC.SettingsSteamLastActivityImportErrorAccount),
                     resources.GetString("LOCImportError"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -525,7 +528,7 @@ namespace SteamLibrary
             if (!db.IsOpen)
             {
                 dialogs.ShowMessage(
-                    resources.GetString("LOCSettingsSteamLastActivityImportErrorDb"),
+                    resources.GetString(LOC.SettingsSteamLastActivityImportErrorDb),
                     resources.GetString("LOCImportError"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -557,7 +560,7 @@ namespace SteamLibrary
             {
                 Logger.Error(exc, "Failed to import Steam last activity.");
                 dialogs.ShowMessage(
-                    resources.GetString("LOCSettingsSteamLastActivityImportError"),
+                    resources.GetString(LOC.SettingsSteamLastActivityImportError),
                     resources.GetString("LOCImportError"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -620,10 +623,10 @@ namespace SteamLibrary
                 {
                     Source = new MetadataNameProperty("Steam"),
                     GameId = gameId,
-                    Categories = appData.Select(a => new MetadataNameProperty(a)).ToList(),
+                    Categories = appData.Select(a => new MetadataNameProperty(a)).Cast<MetadataProperty>().ToHashSet(),
                     Hidden = app["hidden"].AsInteger() == 1,
                     Favorite = isFavorite,
-                    Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                    Platforms = new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
                 });
             }
 
@@ -637,8 +640,8 @@ namespace SteamLibrary
             var db = PlayniteApi.Database;
 
             if (dialogs.ShowMessage(
-                resources.GetString("LOCSettingsSteamCatImportWarn"),
-                resources.GetString("LOCSettingsSteamCatImportWarnTitle"),
+                resources.GetString(LOC.SettingsSteamCatImportWarn),
+                resources.GetString(LOC.SettingsSteamCatImportWarnTitle),
                 MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
             {
                 return;
@@ -647,7 +650,7 @@ namespace SteamLibrary
             if (accountId == 0)
             {
                 dialogs.ShowMessage(
-                    resources.GetString("LOCSettingsSteamCatImportErrorAccount"),
+                    resources.GetString(LOC.SettingsSteamCatImportErrorAccount),
                     resources.GetString("LOCImportError"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -656,7 +659,7 @@ namespace SteamLibrary
             if (!db.IsOpen)
             {
                 dialogs.ShowMessage(
-                    resources.GetString("LOCSettingsSteamCatImportErrorDb"),
+                    resources.GetString(LOC.SettingsSteamCatImportErrorDb),
                     resources.GetString("LOCImportError"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -677,6 +680,10 @@ namespace SteamLibrary
                         if (game.Categories.HasItems())
                         {
                             dbGame.CategoryIds = db.Categories.Add(game.Categories).Select(a => a.Id).ToList();
+                        }
+                        else
+                        {
+                            dbGame.CategoryIds = null;
                         }
 
                         if (game.Hidden)
@@ -699,7 +706,7 @@ namespace SteamLibrary
             {
                 Logger.Error(exc, "Failed to import Steam categories.");
                 dialogs.ShowMessage(
-                    resources.GetString("LOCSettingsSteamCatImportError"),
+                    resources.GetString(LOC.SettingsSteamCatImportError),
                     resources.GetString("LOCImportError"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }

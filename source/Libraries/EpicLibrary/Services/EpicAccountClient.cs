@@ -43,6 +43,7 @@ namespace EpicLibrary.Services
         private readonly string catalogUrl = @"";
         private readonly string playtimeUrl = @"";
         private const string authEcodedString = "MzRhMDJjZjhmNDQxNGUyOWIxNTkyMTg3NmRhMzZmOWE6ZGFhZmJjY2M3Mzc3NDUwMzlkZmZlNTNkOTRmYzc2Y2Y=";
+        private const string userAgent = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Vivaldi/4.3";
 
         public EpicAccountClient(IPlayniteAPI api, string tokensPath)
         {
@@ -87,7 +88,14 @@ namespace EpicLibrary.Services
         {
             var loggedIn = false;
             var apiRedirectContent = string.Empty;
-            using (var view = api.WebViews.CreateView(580, 700))
+
+            using (var view = api.WebViews.CreateView(new WebViewSettings
+            {
+                WindowWidth = 580,
+                WindowHeight = 700,
+                // This is needed otherwise captcha won't pass
+                UserAgent = userAgent
+            }))
             {
                 view.LoadingChanged += async (s, e) =>
                 {
@@ -163,6 +171,11 @@ namespace EpicLibrary.Services
                 {
                     renewToknes(tokens.refresh_token);
                     tokens = loadTokens();
+                    if (tokens.account_id.IsNullOrEmpty() || tokens.access_token.IsNullOrEmpty())
+                    {
+                        return false;
+                    }
+
                     var account = InvokeRequest<AccountResponse>(accountUrl + tokens.account_id, tokens).GetAwaiter().GetResult().Item2;
                     return account.id == tokens.account_id;
                 }
@@ -199,11 +212,11 @@ namespace EpicLibrary.Services
         public CatalogItem GetCatalogItem(string nameSpace, string id, string cachePath)
         {
             Dictionary<string, CatalogItem> result = null;
-            if (!cachePath.IsNullOrEmpty() && File.Exists(cachePath))
+            if (!cachePath.IsNullOrEmpty() && FileSystem.FileExists(cachePath))
             {
                 try
                 {
-                    result = Serialization.FromJsonFile<Dictionary<string, CatalogItem>>(cachePath);
+                    result = Serialization.FromJson<Dictionary<string, CatalogItem>>(FileSystem.ReadStringFromFile(cachePath));
                 }
                 catch (Exception e)
                 {
@@ -299,15 +312,16 @@ namespace EpicLibrary.Services
 
         private string getExcahngeToken(string sid)
         {
-            using (var handler = new HttpClientHandler())
-            using (var httpClient = new HttpClient())
+            var cookieContainer = new CookieContainer();
+            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+            using (var httpClient = new HttpClient(handler))
             {
                 httpClient.DefaultRequestHeaders.Clear();
                 httpClient.DefaultRequestHeaders.Add("X-Epic-Event-Action", "login");
                 httpClient.DefaultRequestHeaders.Add("X-Epic-Event-Category", "login");
                 httpClient.DefaultRequestHeaders.Add("X-Epic-Strategy-Flags", "");
                 httpClient.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
-                httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0");
+                httpClient.DefaultRequestHeaders.Add("User-Agent", userAgent);
 
                 httpClient.GetAsync(@"https://www.epicgames.com/id/api/set-sid?sid=" + sid).GetAwaiter().GetResult();
                 var resp = httpClient.GetAsync(@"https://www.epicgames.com/id/api/csrf").GetAwaiter().GetResult();
@@ -317,6 +331,17 @@ namespace EpicLibrary.Services
                     var match = Regex.Match(cookies.First(), @"=(.+);");
                     var xsrf = match.Groups[1].Value;
                     httpClient.DefaultRequestHeaders.Add("X-XSRF-TOKEN", xsrf);
+                    var country = "US";
+                    try
+                    {
+                        country = System.Globalization.CultureInfo.CurrentCulture.Name.Split(new char[] { '-' }).Last();
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error(e, $"Failed to get country for auth request.");
+                    }
+
+                    cookieContainer.Add(new Uri("https://www.epicgames.com"), new Cookie("EPIC_COUNTRY", country));
                     resp = httpClient.PostAsync("https://www.epicgames.com/id/api/exchange/generate", null).GetAwaiter().GetResult();
                     var respContent = resp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     return Serialization.FromJson<Dictionary<string, string>>(respContent)["code"];

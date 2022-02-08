@@ -55,19 +55,23 @@ Beachte, dass die Option des öffentlichen Kontonamens nur bei Konten funktionie
     <sys:String x:Key="LOCSteamBackgroundSourceScreenshot">Shop-Screenshot</sys:String>
     <sys:String x:Key="LOCSteamBackgroundSourceStore">Shop-Hintergrund</sys:String>
     <sys:String x:Key="LOCSteamBackgroundSourceBanner">Banner</sys:String>
-    <sys:String x:Key="LOCSteamShowFriendsButton"></sys:String>
+    <sys:String x:Key="LOCSteamShowFriendsButton">Schaltfläche »Freunde« in oberer Leiste anzeigen</sys:String>
     <!--IGDB-->
     <sys:String x:Key="LOCIgdbUseScreenshotIfNecessary">Screenshots verwenden, falls kein Bildmaterial verfügbar</sys:String>
     <sys:String x:Key="LOCIgdbMultipleArtworkOptionsTitle">Falls mehrere Bilder verfügbar, das folgende verwenden:</sys:String>
     <sys:String x:Key="LOCIgdbSelectBackgroundTitle">Hintergrundbild für {0} auswählen</sys:String>
     <!--Humble-->
     <sys:String x:Key="LOCHumbleIgnoreThirdPartyStoreGames">Spiele von Drittanbieter-Shops ignorieren</sys:String>
-    <sys:String x:Key="LOCHumbleImportTroveGames">Trove-Spiele importieren</sys:String>
+    <sys:String x:Key="LOCHumbleImportTroveGames">Humble-Choice-Spiele importieren</sys:String>
+    <sys:String x:Key="LOCHumbleImportTroveGamesTooltip">Spiele importieren, die als Teil des Humble-Choice-Abonnements verfügbar sind.</sys:String>
+    <sys:String x:Key="LOCHumbleGeneralLibrary">Humble-Library-Spiele importieren</sys:String>
+    <sys:String x:Key="LOCHumbleGeneralLibraryTooltip">Normale Käufe aus dem Humble Store und aus Bundles importieren.</sys:String>
     <sys:String x:Key="LOCHumbleIgnoreThirdPartyStoreGamesTooltip" xml:space="preserve">Aktivieren, um keine Spiele zu importieren, die einen Drittanbieter-Client erfordern. Einschließlich bereits von Playnite verwalteter Shops, um Duplikate zu vermeiden.</sys:String>
     <sys:String x:Key="LOCHumbleImportThirdPartyDrmFree">Importieren, falls DRM-freie Version verfügbar</sys:String>
     <sys:String x:Key="LOCHumbleImportThirdPartyDrmFreeTooltip">Spiele mit Drittanbieter-Client importieren, falls auch eine DRM-freie Version verfügbar ist.</sys:String>
+    <sys:String x:Key="LOCHumbleAlwaysUseLaucnherToStart">Immer Humble-App verwenden, um Spiele zu starten</sys:String>
+    <sys:String x:Key="LOCHumbleAlwaysUseLaucnherToStartTooltip">Falls deaktiviert, versucht Playnite, Spiele direkt zu starten und dabei die Humble-App zu umgehen.</sys:String>
     <!--Xbox-->
     <sys:String x:Key="LOCXboxXboxAppClientPriorityLaunch">Beim Öffen des Clients App für Xbox Game Pass anstatt Microsoft Store starten</sys:String>
-    <sys:String x:Key="LOCXboxImport360Games">Xbox-360-Spiele importieren</sys:String>
-    <sys:String x:Key="LOCXboxImportXboneGames">Xbox-One-Spiele importieren</sys:String>
+    <sys:String x:Key="LOCXboxImportConsoleGames">XBox-Konsolen-Spiele importieren</sys:String>
 </ResourceDictionary>

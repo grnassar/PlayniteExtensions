@@ -56,7 +56,7 @@ namespace IGDBMetadata
             }
             return plugin.PlayniteApi.Dialogs.ChooseImageFile(
                 selection,
-                string.Format(plugin.PlayniteApi.Resources.GetString("LOCIgdbSelectBackgroundTitle"), IgdbData.name)) as IgdbImageOption;
+                string.Format(plugin.PlayniteApi.Resources.GetString(LOC.IgdbSelectBackgroundTitle), IgdbData.name)) as IgdbImageOption;
         }
 
         public override MetadataFile GetBackgroundImage(GetMetadataFieldArgs args)
@@ -224,7 +224,7 @@ namespace IGDBMetadata
         {
             if (AvailableFields.Contains(MetadataField.Series))
             {
-                return new List<MetadataProperty> { new MetadataNameProperty(IgdbData.collection.name) };
+                return new HashSet<MetadataProperty> { new MetadataNameProperty(IgdbData.collection.name) };
             }
 
             return base.GetSeries(args);
@@ -381,8 +381,15 @@ namespace IGDBMetadata
                     }
                     else
                     {
-                        var res = plugin.GetSearchResults(a);
-                        return res.Select(b => b as GenericItemOption).ToList();
+                        if (a.IsNullOrWhiteSpace())
+                        {
+                            return new List<GenericItemOption>();
+                        }
+                        else
+                        {
+                            var res = plugin.GetSearchResults(a.Replace("\\", "").Replace("/", "").Trim());
+                            return res.Select(b => b as GenericItemOption).ToList();
+                        }
                     }
                 }, options.GameData.Name);
 

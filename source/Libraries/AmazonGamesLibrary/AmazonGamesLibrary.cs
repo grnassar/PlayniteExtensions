@@ -120,7 +120,7 @@ namespace AmazonGamesLibrary
                     continue;
                 }
 
-                var match = Regex.Match(program.UninstallString, @"-p\s+([a-zA-Z0-9\-]+)");
+                var match = Regex.Match(program.UninstallString, @"-p\s+(\S+)");
                 var gameId = match.Groups[1].Value;
                 if (!games.ContainsKey(gameId))
                 {
@@ -131,7 +131,7 @@ namespace AmazonGamesLibrary
                         Source = new MetadataNameProperty("Amazon"),
                         Name = program.DisplayName.RemoveTrademarks(),
                         IsInstalled = true,
-                        Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                        Platforms = new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
                     };
 
                     games.Add(game.GameId, game);
@@ -158,7 +158,7 @@ namespace AmazonGamesLibrary
                     Source = new MetadataNameProperty("Amazon"),
                     GameId = item.product.id,
                     Name = item.product.title.RemoveTrademarks(),
-                    Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                    Platforms = new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
                 };
 
                 games.Add(game);

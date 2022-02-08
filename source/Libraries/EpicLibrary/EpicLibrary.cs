@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
@@ -18,6 +19,7 @@ namespace EpicLibrary
     [LoadPlugin]
     public class EpicLibrary : LibraryPluginBase<EpicLibrarySettingsViewModel>
     {
+        private static readonly ILogger logger = LogManager.GetLogger();
         internal readonly string TokensPath;
 
         public EpicLibrary(IPlayniteAPI api) : base(
@@ -60,14 +62,24 @@ namespace EpicLibrary
                     continue;
                 }
 
+                var gameName = manifest?.DisplayName ?? Path.GetFileName(app.InstallLocation);
+                var installLocation = manifest?.InstallLocation ?? app.InstallLocation;
+                var isInstalled = true;
+                if (!Directory.Exists(installLocation))
+                {
+                    logger.Error($"Epic game {gameName} installation directory {installLocation} not detected.");
+                    isInstalled = false;
+                    installLocation = string.Empty;
+                }
+
                 var game = new GameMetadata()
                 {
                     Source = new MetadataNameProperty("Epic"),
                     GameId = app.AppName,
-                    Name = manifest?.DisplayName ?? Path.GetFileName(app.InstallLocation),
-                    InstallDirectory = manifest?.InstallLocation ?? app.InstallLocation,
-                    IsInstalled = true,
-                    Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                    Name = gameName,
+                    InstallDirectory = installLocation,
+                    IsInstalled = isInstalled,
+                    Platforms = new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
                 };
 
                 game.Name = game.Name.RemoveTrademarks();
@@ -77,7 +89,7 @@ namespace EpicLibrary
             return games;
         }
 
-        internal List<GameMetadata> GetLibraryGames()
+        internal List<GameMetadata> GetLibraryGames(CancellationToken cancelToken)
         {
             var cacheDir = GetCachePath("catalogcache");
             var games = new List<GameMetadata>();
@@ -91,6 +103,11 @@ namespace EpicLibrary
             var playtimeItems = accountApi.GetPlaytimeItems();
             foreach (var gameAsset in assets.Where(a => a.@namespace != "ue"))
             {
+                if (cancelToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 var cacheFile = Paths.GetSafePathName($"{gameAsset.@namespace}_{gameAsset.catalogItemId}_{gameAsset.buildVersion}.json");
                 cacheFile = Path.Combine(cacheDir, cacheFile);
                 var catalogItem = accountApi.GetCatalogItem(gameAsset.@namespace, gameAsset.catalogItemId, cacheFile);
@@ -109,7 +126,7 @@ namespace EpicLibrary
                     Source = new MetadataNameProperty("Epic"),
                     GameId = gameAsset.appName,
                     Name = catalogItem.title.RemoveTrademarks(),
-                    Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                    Platforms = new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
                 };
 
                 var playtimeItem = playtimeItems?.FirstOrDefault(x => x.artifactId == gameAsset.appName);
@@ -149,7 +166,7 @@ namespace EpicLibrary
             {
                 try
                 {
-                    var libraryGames = GetLibraryGames();
+                    var libraryGames = GetLibraryGames(args.CancelToken);
                     Logger.Debug($"Found {libraryGames.Count} library Epic games.");
 
                     if (!SettingsViewModel.Settings.ImportUninstalledGames)

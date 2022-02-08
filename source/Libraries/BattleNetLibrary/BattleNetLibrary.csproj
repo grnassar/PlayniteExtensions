@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Playnite.SDK, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PlayniteSDK.6.0.0-preview2\lib\net462\Playnite.SDK.dll</HintPath>
+      <HintPath>..\..\packages\PlayniteSDK.6.0.0\lib\net462\Playnite.SDK.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -156,6 +156,7 @@
     <Compile Include="BattleNetMetadataProvider.cs" />
     <Compile Include="BattleNetLibrarySettingsViewModel.cs" />
     <Compile Include="Environment.cs" />
+    <Compile Include="LocalizationKeys.cs" />
     <Compile Include="Models\BattleNetApiStatus.cs" />
     <Compile Include="Models\BNetApp.cs" />
     <Compile Include="Models\ClassicGames.cs" />
@@ -176,8 +177,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\localization\en_US.xaml">
-      <Link>Localization\en_US.xaml</Link>
+    <None Include="Localization\*.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

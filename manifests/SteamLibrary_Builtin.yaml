@@ -1,8 +1,38 @@
 AddonId: SteamLibrary_Builtin
 Packages:
+  - Version: 2.2
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-09-24
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/SteamLibrary_Builtin_2_2.pext
+    Changelog:
+      - Updated dependencies for Playnite 9
+  - Version: 2.1
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-09-08
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/1.0/SteamLibrary_Builtin_2_1.pext
+    Changelog:
+      - Updated to support Playnite 9 beta 2
   - Version: 2.0
     RequiredApiVersion: 6.0.0
     ReleaseDate: 2021-09-03
     PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/1.0/SteamLibrary_Builtin_2_0.pext
     Changelog:
       - Playnite 9 support
+  - Version: 2.3
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-10-29
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/SteamLibrary_Builtin_2_3.pext
+    Changelog:
+      - Franchine field from Steam is used to populate Series field
+      - Small optimization to metadata download
+      - Fixed private API keys leaking to logs
+  - Version: 2.4
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2022-01-03
+    PackageUrl: https://github.com/JosefNemec/PlayniteExtensions/releases/download/2.2/SteamLibrary_Builtin_2_4.pext
+    Changelog:
+      - Use game descriptions without promotion junk
+      - Prioritize English localized game names
+      - Fixed crash when installing or uninstalling a game and Steam installation is not detected
+      - Fixed newly added games have "Last Played" set to date where they were bought
+      - Fixed (Re)Import of Steam categories does not take into account games where categories have been removed in Steam

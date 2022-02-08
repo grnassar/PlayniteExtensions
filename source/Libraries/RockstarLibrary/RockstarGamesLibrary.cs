@@ -39,25 +39,34 @@ namespace RockstarGamesLibrary
                     continue;
                 }
 
-                var match = Regex.Match(app.UninstallString, @"Launcher\.exe.+uninstall=(.+)$", RegexOptions.IgnoreCase);
+                var match = Regex.Match(app.UninstallString, @"(?:Launcher|uninstall)\.exe.+uninstall=(.+)$", RegexOptions.IgnoreCase);
                 if (match.Success)
                 {
                     var titleId = match.Groups[1].Value;
                     var rsGame = RockstarGames.Games.FirstOrDefault(a => a.TitleId == titleId);
                     if (rsGame == null)
                     {
-                        logger.Warn($"Uknown Rockstar game with titleid {titleId}");
+                        logger.Warn($"Unknown Rockstar game with titleid {titleId}");
                         continue;
+                    }
+
+                    var isInstalled = true;
+                    var installDirectory = app.InstallLocation;
+                    if (!Directory.Exists(installDirectory))
+                    {
+                        logger.Error($"Rockstar game {rsGame.Name} installation directory {installDirectory} not detected.");
+                        isInstalled = false;
+                        installDirectory = string.Empty;
                     }
 
                     var newGame = new GameMetadata
                     {
-                        IsInstalled = true,
-                        InstallDirectory = app.InstallLocation,
+                        IsInstalled = isInstalled,
+                        InstallDirectory = installDirectory,
                         Source = new MetadataNameProperty("Rockstar Games"),
                         Name = rsGame.Name,
                         GameId = titleId,
-                        Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                        Platforms = new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
                     };
 
                     if (!string.IsNullOrEmpty(app.DisplayIcon))

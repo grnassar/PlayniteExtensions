@@ -34,8 +34,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Playnite.SDK, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PlayniteSDK.6.0.0-preview2\lib\net462\Playnite.SDK.dll</HintPath>
+    <Reference Include="Playnite.SDK, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PlayniteSDK.6.2.0\lib\net462\Playnite.SDK.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -170,6 +170,7 @@
     <Compile Include="EpicLibrarySettingsView.xaml.cs">
       <DependentUpon>EpicLibrarySettingsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LocalizationKeys.cs" />
     <Compile Include="Models\AccountResponse.cs" />
     <Compile Include="Models\AssetsResponse.cs" />
     <Compile Include="Models\CatalogResponse.cs" />
@@ -196,8 +197,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\localization\en_US.xaml">
-      <Link>Localization\en_US.xaml</Link>
+    <None Include="Localization\*.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

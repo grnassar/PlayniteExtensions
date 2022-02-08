@@ -167,7 +167,7 @@ namespace GogLibrary
             var programs = Programs.GetUnistallProgramsList();
             foreach (var program in programs)
             {
-                var match = Regex.Match(program.RegistryKeyName, @"(\d+)_is1");
+                var match = Regex.Match(program.RegistryKeyName, @"^(\d+)_is1");
                 if (!match.Success || program.Publisher != "GOG.com" || program.RegistryKeyName.StartsWith("GOGPACK"))
                 {
                     continue;
@@ -186,7 +186,7 @@ namespace GogLibrary
                     Source = new MetadataNameProperty("GOG"),
                     Name = program.DisplayName.RemoveTrademarks(),
                     IsInstalled = true,
-                    Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                    Platforms = new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
                 };
 
                 games.Add(game.GameId, game);
@@ -230,14 +230,16 @@ namespace GogLibrary
                 }
 
                 var libGamesStats = api.GetOwnedGames(api.GetAccountInfo());
-                if (libGamesStats == null)
+                if (libGamesStats != null)
                 {
-                    throw new Exception("Failed to obtain library stats data.");
+                    foreach (LibraryGameResponse libGame in libGames)
+                    {
+                        libGame.stats = libGamesStats?.FirstOrDefault(x => x.game.id.Equals(libGame.game.id))?.stats ?? null;
+                    }
                 }
-
-                foreach (LibraryGameResponse libGame in libGames)
+                else
                 {
-                    libGame.stats = libGamesStats?.FirstOrDefault(x => x.game.id.Equals(libGame.game.id))?.stats ?? null;
+                    Logger.Warn("Failed to obtain library stats data.");
                 }
 
                 return LibraryGamesToGames(libGames).ToList();
@@ -270,14 +272,14 @@ namespace GogLibrary
                     {
                         new Link("Store", @"https://www.gog.com" + game.game.url)
                     },
-                    Platforms = new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
+                    Platforms = new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") }
                 };
 
                 // This is a hack for inconsistent data model on GOG's side.
                 // For some reason game stats are returned as an empty array if no stats exist for a game.
                 // But single object representation is returned instead if stats do exits.
                 // Better solution would require adding JSON.NET dependency.
-                if (game.stats.GetType().Name == "JObject")
+                if (game.stats?.GetType().Name == "JObject")
                 {
                     var stats = ((dynamic)game.stats).ToObject<Dictionary<string, LibraryGameResponse.Stats>>() as Dictionary<string, LibraryGameResponse.Stats>;
                     if (stats.Keys?.Any() == true)

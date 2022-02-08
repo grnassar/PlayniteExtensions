@@ -26,8 +26,9 @@ namespace Steam
 
     public class MetadataProvider
     {
-        private ILogger logger = LogManager.GetLogger();
+        private static readonly ILogger logger = LogManager.GetLogger();
         private readonly SteamApiClient apiClient;
+        private readonly WebApiClient webApiClient;
 
         private readonly string[] backgroundUrls = new string[]
         {
@@ -35,9 +36,10 @@ namespace Steam
             @"https://steamcdn-a.akamaihd.net/steam/apps/{0}/page_bg_generated.jpg"
         };
 
-        public MetadataProvider(SteamApiClient apiClient)
+        public MetadataProvider(SteamApiClient apiClient, WebApiClient webApiClient)
         {
             this.apiClient = apiClient;
+            this.webApiClient = webApiClient;
         }
 
         public static string GetWorkshopUrl(uint appId)
@@ -105,12 +107,12 @@ namespace Steam
 
         internal StoreAppDetailsResult.AppDetails GetStoreData(uint appId)
         {
-            return SendDelayedStoreRequest(() => WebApiClient.GetStoreAppDetail(appId), appId);
+            return SendDelayedStoreRequest(() => webApiClient.GetStoreAppDetail(appId), appId);
         }
 
         internal AppReviewsResult.QuerySummary GetUserReviewsData(uint appId)
         {
-            var ratings = SendDelayedStoreRequest(() => WebApiClient.GetUserRating(appId), appId);
+            var ratings = SendDelayedStoreRequest(() => webApiClient.GetUserRating(appId), appId);
             if (ratings?.success == 1)
             {
                 return ratings.query_summary;
@@ -251,7 +253,16 @@ namespace Steam
             bool downloadVerticalCovers)
         {
             var metadata = DownloadGameMetadata(appId, backgroundSource, downloadVerticalCovers);
-            metadata.Name = metadata.ProductDetails?["common"]["name"]?.Value ?? metadata.StoreDetails?.name;
+            var newName = metadata.ProductDetails?["common"]["name_localized"]["english"]?.Value;
+            if (newName != null)
+            {
+                metadata.Name = newName;
+            }
+            else
+            {
+                metadata.Name = metadata.ProductDetails?["common"]["name"]?.Value ?? metadata.StoreDetails?.name;
+            }
+
             metadata.Links = new List<Link>()
             {
                 new Link(ResourceProvider.GetString("LOCSteamLinksCommunityHub"), $"https://steamcommunity.com/app/{appId}"),
@@ -272,10 +283,10 @@ namespace Steam
                 metadata.Links.Add(new Link(ResourceProvider.GetString("LOCSteamLinksWorkshop"), GetWorkshopUrl(appId)));
             }
 
-            var features = new List<MetadataProperty>();
+            var features = new HashSet<MetadataProperty>();
             if (metadata.StoreDetails != null)
             {
-                metadata.Description = ParseDescription(metadata.StoreDetails.detailed_description);
+                metadata.Description = ParseDescription(metadata.StoreDetails.about_the_game);
                 var cultInfo = new CultureInfo("en-US", false).TextInfo;
                 if (metadata.StoreDetails.release_date.date?.IsNullOrEmpty() == false)
                 {
@@ -293,12 +304,20 @@ namespace Steam
 
                 if (metadata.StoreDetails.publishers.HasNonEmptyItems())
                 {
-                    metadata.Publishers = metadata.StoreDetails.publishers.Select(a => new MetadataNameProperty(a)).ToList();
+                    metadata.Publishers = metadata.StoreDetails.publishers.
+                        Where(a => !a.IsNullOrWhiteSpace()).
+                        Select(a => new MetadataNameProperty(a)).
+                        Cast<MetadataProperty>().
+                        ToHashSet();
                 }
 
                 if (metadata.StoreDetails.developers.HasNonEmptyItems())
                 {
-                    metadata.Developers = metadata.StoreDetails.developers.Select(a => new MetadataNameProperty(a)).ToList();
+                    metadata.Developers = metadata.StoreDetails.developers.
+                        Where(a => !a.IsNullOrWhiteSpace()).
+                        Select(a => new MetadataNameProperty(a)).
+                        Cast<MetadataProperty>().
+                        ToHashSet();
                 }
 
                 metadata.Features = features;
@@ -323,7 +342,7 @@ namespace Steam
 
                 if (metadata.StoreDetails.genres.HasItems())
                 {
-                    metadata.Genres = metadata.StoreDetails.genres.Select(a => new MetadataNameProperty(a.description)).ToList();
+                    metadata.Genres = metadata.StoreDetails.genres.Select(a => new MetadataNameProperty(a.description)).Cast<MetadataProperty>().ToHashSet();
                 }
             }
 
@@ -389,7 +408,7 @@ namespace Steam
                     }
                     if (vrArea.Name.Contains("roomscale"))
                     {
-                        features.AddMissing(new MetadataNameProperty("VR Room-Scale"));
+                        features.Add(new MetadataNameProperty("VR Room-Scale"));
                         vrSupport = true;
                     }
                 }
@@ -417,6 +436,15 @@ namespace Steam
                 if (vrSupport)
                 {
                     features.Add(new MetadataNameProperty("VR"));
+                }
+
+                foreach (var ass in metadata.ProductDetails["common"]["associations"].Children)
+                {
+                    if (ass["type"].Value == "franchise")
+                    {
+                        metadata.Series = new HashSet<MetadataProperty> { new MetadataNameProperty(ass["name"].Value) };
+                        break;
+                    }
                 }
             }
 

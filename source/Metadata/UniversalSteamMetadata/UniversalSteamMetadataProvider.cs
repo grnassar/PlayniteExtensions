@@ -28,6 +28,7 @@ namespace UniversalSteamMetadata
         private readonly UniversalSteamMetadata plugin;
         private SteamGameMetadata currentMetadata;
         private readonly SteamApiClient apiClient;
+        private readonly WebApiClient webApiClient;
 
         public override List<MetadataField> AvailableFields { get; } = new List<MetadataField>
         {
@@ -44,7 +45,8 @@ namespace UniversalSteamMetadata
             MetadataField.ReleaseDate,
             MetadataField.Features,
             MetadataField.Name,
-            MetadataField.Platform
+            MetadataField.Platform,
+            MetadataField.Series
         };
 
         public UniversalSteamMetadataProvider(MetadataRequestOptions options, UniversalSteamMetadata plugin)
@@ -52,6 +54,7 @@ namespace UniversalSteamMetadata
             this.options = options;
             this.plugin = plugin;
             apiClient = new SteamApiClient();
+            webApiClient = new WebApiClient();
         }
 
         public override void Dispose()
@@ -64,6 +67,8 @@ namespace UniversalSteamMetadata
             {
                 logger.Error(e, "Failed to logout Steam client.");
             }
+
+            webApiClient.Dispose();
         }
 
         public override string GetName(GetMetadataFieldArgs args)
@@ -234,9 +239,20 @@ namespace UniversalSteamMetadata
             return base.GetFeatures(args);
         }
 
+        public override IEnumerable<MetadataProperty> GetSeries(GetMetadataFieldArgs args)
+        {
+            GetGameData();
+            if (currentMetadata != null)
+            {
+                return currentMetadata.Series;
+            }
+
+            return base.GetSeries(args);
+        }
+
         public override IEnumerable<MetadataProperty> GetPlatforms(GetMetadataFieldArgs args)
         {
-            return new List<MetadataProperty> { new MetadataSpecProperty("pc_windows") };
+            return new HashSet<MetadataProperty> { new MetadataSpecProperty("pc_windows") };
         }
 
         internal void GetGameData()
@@ -248,7 +264,7 @@ namespace UniversalSteamMetadata
 
             try
             {
-                var metadataProvider = new MetadataProvider(apiClient);
+                var metadataProvider = new MetadataProvider(apiClient, webApiClient);
                 if (BuiltinExtensions.GetExtensionFromId(options.GameData.PluginId) == BuiltinExtension.SteamLibrary)
                 {
                     var appId = uint.Parse(options.GameData.GameId);
@@ -282,7 +298,7 @@ namespace UniversalSteamMetadata
                             {
                                 try
                                 {
-                                    var store = WebApiClient.GetStoreAppDetail(appId);
+                                    var store = webApiClient.GetStoreAppDetail(appId);
                                     return new List<GenericItemOption> { new StoreSearchResult
                                     {
                                         GameId = appId,
